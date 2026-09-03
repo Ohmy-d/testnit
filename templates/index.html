@@ -23,10 +23,6 @@
 <meta name="twitter:title"       content="TESTNIT — Security Intelligence Platform">
 <meta name="twitter:description" content="Full-spectrum website security scanning — headers, SSL, XSS, SQLi, trackers and more, straight from your browser.">
 <meta name="twitter:image"       content"https://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-image.jpg">
-
-<!-- OPTIONAL video preview — uncomment and fill in if you want Discord/
-     Telegram/Facebook to render a playable clip instead of a static
-     image. WhatsApp will still use og:image above regardless. -->
 <meta property="og:video"            content="https://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-preview.mp4">
 <meta property="og:video:secure_url" content="https://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-preview.mp4">
 <meta property="og:video:type"       content="video/mp4">
@@ -36,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── Reset & Base ─────────────────────────────────────────────────── */
+
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:      #050308;
@@ -99,7 +95,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,3,8,.95);
 #status-dot{display:flex;align-items:center;gap:6px;font-size:.75em;font-weight:600;letter-spacing:1px}
 #status-dot .dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
 
-/* ── Glitch title ─────────────────────────────────────────────────── */
+
 .glitch{position:relative;display:inline-block}
 .glitch::before,.glitch::after{content:attr(data-text);position:absolute;
   top:0;left:0;width:100%;height:100%}
@@ -156,7 +152,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,3,8,.95);
 .sev-LOW{background:var(--purple);color:#fff}
 .sev-INFO{background:var(--dim);color:#fff}
 
-/* ── Terminal (real terminal window) ─────────────────────────────── */
+
 #terminal-card{flex:1;display:flex;flex-direction:column;min-height:56vh;padding:0;overflow:hidden;
   border:none}
 .term-titlebar{display:flex;align-items:center;gap:10px;padding:10px 14px;
@@ -435,8 +431,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,3,8,.95);
 
 
 <!-- ══════════════════════════════════════════════════════════════════
-     PAGE 3 — REPORT
-═══════════════════════════════════════════════════════════════════ -->
+     
+═══════════════════════════════════════════════════ -->
 <div id="page-report" class="page" style="display:none;flex-direction:column">
   <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
     <div style="flex:1;color:var(--dim);font-size:.8em">
@@ -450,7 +446,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(5,3,8,.95);
 
 
 <!-- ══════════════════════════════════════════════════════════════════
-     PAGE 4 — API KEYS
+
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="page-keys" class="page" style="display:none">
   <div class="card">
