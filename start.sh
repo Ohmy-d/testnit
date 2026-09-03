@@ -5,7 +5,7 @@
 cd "$(dirname "$0")"
 
 echo ""
-echo "  ⚡ CyberLab Security Intelligence Platform"
+echo "  Testnit CyberLab Security Intelligence Platform"
 echo "  ──────────────────────────────────────────"
 echo ""
 
