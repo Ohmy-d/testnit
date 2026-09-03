@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CyberLab — Advanced Security Intelligence Platform
+Textnit   CyberLab — Advanced Security Intelligence Platform
 Real scanning using direct probes + third-party APIs.
 For authorized testing of your own systems only.
 """
