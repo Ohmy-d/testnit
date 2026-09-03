@@ -1,1 +1,9 @@
+run
 
+pip install flask requests --break-system-packages
+bash start.sh
+
+
+nano .env 
+
+add your API keys 
