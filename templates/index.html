@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self';">
+<title>CyberLab — Security Intelligence Platform</title>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SOCIAL SHARE PREVIEW (Open Graph + Twitter Card)
+     This is the "big image + title + description" card that shows up
+     when this page's URL is pasted into WhatsApp, Telegram, Discord,
+     Facebook, X, etc. Crawlers read ONLY these tags — not what's
+     actually rendered on screen — so every value below must be a
+     real, publicly reachable value once this is deployed.
+
+     TO CUSTOMIZE — replace the 4 things below:
+       1. og:url            → the real public URL this page lives at
+       2. og:image (x3)     → an ABSOLUTE https:// URL to a hosted
+                               image file (see sizing notes below)
+       3. og:title           → the headline shown in the card
+       4. og:description     → the text shown under the headline
+
+     IMAGE REQUIREMENTS (matters most for WhatsApp):
+       • Must be an absolute https:// URL — a local path like
+         "assets/og.jpg" will NOT work, it has to resolve on its own
+         from any device, with no login/redirect in front of it.
+       • Recommended size ~1200×630px (1.91:1) for FB/X/Discord.
+         WhatsApp is more forgiving and will crop a square/circular
+         badge-style image like the one in your reference screenshot
+         reasonably well, but 1200×630 is still the safe default.
+       • Keep the file under ~300KB — large images get skipped by
+         some crawlers (notably WhatsApp).
+       • WhatsApp caches a link's preview per-URL and has no public
+         "refresh" tool (unlike Facebook's Sharing Debugger) — if you
+         change the image/text after already sharing a link once,
+         WhatsApp may keep showing the old card. Test with a fresh
+         URL (e.g. add a throwaway ?v=2 query string) while iterating.
+       • Video (og:video) is supported by Discord/Telegram/Facebook
+         but WhatsApp ignores it and falls back to og:image — so
+         always set og:image even if you also add a video block.
+═══════════════════════════════════════════════════════════════════ -->
+<meta property="og:type"             content="website">
+<meta property="og:url"              content="https://subgroup-reclaim-sulphate.ngrok-free.dev/">
+<meta property="og:title"            content="TESTNIT — Security Intelligence Platform">
+<meta property="og:description"      content="Full-spectrum website security scanning — headers, SSL, XSS, SQLi, trackers and more, straight from your browser.">
+<meta property="og:image"            content="htthttps://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-image.jpg">
+<meta property="og:image:secure_url" content="https://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-image.jpg">
+<meta property="og:image:type"       content="image/jpeg">
+<meta property="og:image:width"      content="1200">
+<meta property="og:image:height"     content="630">
+<meta property="og:image:alt"        content="TESTNIT security scanner">
+<meta property="og:site_name"        content="TESTNIT">
+
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="TESTNIT — Security Intelligence Platform">
+<meta name="twitter:description" content="Full-spectrum website security scanning — headers, SSL, XSS, SQLi, trackers and more, straight from your browser.">
+<meta name="twitter:image"       content"https://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-image.jpg">
+
+<!-- OPTIONAL video preview — uncomment and fill in if you want Discord/
+     Telegram/Facebook to render a playable clip instead of a static
+     image. WhatsApp will still use og:image above regardless. -->
+<meta property="og:video"            content="https://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-preview.mp4">
+<meta property="og:video:secure_url" content="https://subgroup-reclaim-sulphate.ngrok-free.dev/assets/og-preview.mp4">
+<meta property="og:video:type"       content="video/mp4">
+<meta property="og:video:width"      content="1280">
+<meta property="og:video:height"     content="720">
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ─────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:      #050308;
+  --bg2:     #0b0614;
+  --bg3:     #130b20;
+  --cyan:    #00f0ff;
+  --purple:  #9d4bff;
+  --magenta: #ff2ec4;
+  --amber:   #ffb200;
+  --red:     #ff2851;
+  --text:    #dcd6ea;
+  --dim:     #6c6488;
+  --border:  #241a3a;
+  --font-ui: 'JetBrains Mono', 'Courier New', monospace;
+  --font-display: 'Orbitron', 'JetBrains Mono', monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:var(--font-ui);overflow-x:hidden}
+
+/* ── Icon system ──────────────────────────────────────────────────── */
+.icon{width:1em;height:1em;display:inline-block;vertical-align:-.15em;
+  stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.icon-lg{width:1.4em;height:1.4em}
+
+/* ── Matrix rain background ───────────────────────────────────────── */
+#matrix-bg{position:fixed;top:0;left:0;width:100%;height:100%;
+  overflow:hidden;z-index:0;opacity:.06;pointer-events:none}
+.col{position:absolute;top:-100%;font-size:14px;color:var(--cyan);
+  writing-mode:vertical-rl;text-orientation:mixed;
+  animation:fall linear infinite;user-select:none}
+@keyframes fall{to{top:110%}}
+
+/* ── Layout ───────────────────────────────────────────────────────── */
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.page{display:none;flex:1;padding:16px;flex-direction:column;gap:12px;min-height:calc(100vh - 60px)}
+.page.active{display:flex}
+
+/* ── Top nav ──────────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:100;background:rgba(5,3,8,.95);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border);padding:0 16px;
+  display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.logo{padding:12px 16px 12px 0;display:flex;align-items:center;gap:10px;
+  border-right:1px solid var(--border);margin-right:16px}
+.logo .icon{color:var(--cyan);width:2.6em;height:2.6em;
+  filter:drop-shadow(0 0 6px rgba(0,240,255,.6))}
+.logo-text{font-family:var(--font-display);font-size:1.65em;font-weight:900;
+  letter-spacing:3px;background:linear-gradient(90deg,var(--cyan) 0%,var(--purple) 55%,var(--magenta) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 10px rgba(0,240,255,.35))}
+.logo-sub{font-size:.58em;color:var(--purple);letter-spacing:3px;display:block;margin-top:2px;font-weight:600}
+.nav-tab{padding:14px 16px;cursor:pointer;font-size:.78em;letter-spacing:1px;
+  border-bottom:2px solid transparent;color:var(--dim);transition:.2s;white-space:nowrap;
+  display:flex;align-items:center;gap:7px;font-weight:500}
+.nav-tab:hover{color:var(--purple);border-bottom-color:var(--purple)}
+.nav-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.blink{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+#status-dot{display:flex;align-items:center;gap:6px;font-size:.75em;font-weight:600;letter-spacing:1px}
+#status-dot .dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+
+/* ── Glitch title ─────────────────────────────────────────────────── */
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;
+  top:0;left:0;width:100%;height:100%}
+.glitch::before{color:var(--magenta);-webkit-text-fill-color:var(--magenta);animation:glitch1 3s infinite;clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%)}
+.glitch::after{color:var(--purple);-webkit-text-fill-color:var(--purple);animation:glitch2 3s infinite;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%)}
+@keyframes glitch1{0%,94%{transform:translate(0)}95%{transform:translate(-3px,1px)}96%{transform:translate(3px,-1px)}100%{transform:translate(0)}}
+@keyframes glitch2{0%,94%{transform:translate(0)}95%{transform:translate(3px,1px)}96%{transform:translate(-3px,-1px)}100%{transform:translate(0)}}
+
+/* ── Cards & panels ───────────────────────────────────────────────── */
+.card{background:var(--bg2);border:none;
+  padding:16px}
+.card-title{font-size:.75em;letter-spacing:2px;color:var(--dim);margin-bottom:12px;
+  text-transform:uppercase;display:flex;align-items:center;gap:8px;font-weight:600}
+.card-title::before{content:'';display:block;width:8px;height:8px;
+  background:var(--cyan);border-radius:50%;box-shadow:0 0 6px var(--cyan);flex-shrink:0}
+
+/* ── Neon input ───────────────────────────────────────────────────── */
+.neon-input{background:var(--bg3);border:1px solid var(--border);
+  color:var(--cyan);padding:12px 16px;font-family:inherit;font-size:.95em;
+  outline:none;transition:.3s;width:100%;border-radius:4px}
+.neon-input:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,240,255,.2)}
+.neon-input::placeholder{color:var(--dim)}
+
+/* ── Buttons ──────────────────────────────────────────────────────── */
+.btn{padding:12px 22px;border:1px solid;font-family:inherit;font-size:.82em;
+  letter-spacing:1.5px;cursor:pointer;border-radius:4px;transition:.2s;
+  text-transform:uppercase;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{border-color:var(--cyan);color:var(--cyan);background:transparent}
+.btn-primary:hover{background:var(--cyan);color:#000;box-shadow:0 0 20px rgba(0,240,255,.4)}
+.btn-secondary{border-color:var(--purple);color:var(--purple);background:transparent}
+.btn-secondary:hover{background:var(--purple);color:#000;box-shadow:0 0 20px rgba(157,75,255,.4)}
+.btn-danger{border-color:var(--red);color:var(--red);background:transparent}
+.btn-danger:hover{background:var(--red);color:#fff;box-shadow:0 0 20px rgba(255,40,81,.4)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── Checkboxes ───────────────────────────────────────────────────── */
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.mod-item{display:flex;align-items:center;gap:9px;padding:9px 12px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:4px;cursor:pointer;
+  transition:.2s;font-size:.8em;color:var(--text)}
+.mod-item:hover{border-color:var(--cyan)}
+.mod-item input{accent-color:var(--cyan);width:14px;height:14px;cursor:pointer}
+.mod-item .icon{color:var(--purple)}
+.mod-item.active{border-color:var(--cyan);background:rgba(0,240,255,.05)}
+.mod-item.active .icon{color:var(--cyan)}
+
+/* ── Severity badges ──────────────────────────────────────────────── */
+.sev{display:inline-block;padding:2px 8px;border-radius:3px;
+  font-size:.7em;font-weight:bold;letter-spacing:1px}
+.sev-CRITICAL{background:var(--red);color:#fff}
+.sev-HIGH{background:var(--amber);color:#000}
+.sev-MEDIUM{background:#ffd166;color:#000}
+.sev-LOW{background:var(--purple);color:#fff}
+.sev-INFO{background:var(--dim);color:#fff}
+
+/* ── Terminal (real terminal window) ─────────────────────────────── */
+#terminal-card{flex:1;display:flex;flex-direction:column;min-height:56vh;padding:0;overflow:hidden;
+  border:none}
+.term-titlebar{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.term-dots{display:flex;gap:7px}
+.term-dots span{width:11px;height:11px;border-radius:50%;display:block}
+.term-dots span:nth-child(1){background:var(--red);box-shadow:0 0 6px var(--red)}
+.term-dots span:nth-child(2){background:var(--amber);box-shadow:0 0 6px var(--amber)}
+.term-dots span:nth-child(3){background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+.term-title{flex:1;text-align:center;font-size:.75em;color:var(--dim);letter-spacing:1px;
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.term-clear{font-size:.78em;cursor:pointer;color:var(--dim);display:flex;align-items:center;gap:5px;
+  padding:4px 8px;border-radius:4px;transition:.2s}
+.term-clear:hover{color:var(--magenta);background:rgba(255,46,196,.08)}
+#terminal{flex:1;background:#020103;padding:16px;font-size:.82em;line-height:1.75;
+  overflow-y:auto;font-family:var(--font-ui)}
+.t-ok{color:var(--cyan)} .t-warn{color:var(--amber)}
+.t-error{color:var(--red)} .t-info{color:var(--purple)} .t-dim{color:var(--dim)}
+.t-line{border-left:2px solid var(--border);padding-left:10px;margin:2px 0}
+.t-line::before{content:'› ';color:var(--purple)}
+.term-cursor{display:inline-block;width:8px;height:1em;background:var(--cyan);
+  vertical-align:middle;animation:blink 1s step-end infinite;box-shadow:0 0 6px var(--cyan)}
+.term-prompt{color:var(--purple)}
+
+/* ── Progress bar ─────────────────────────────────────────────────── */
+.prog-wrap{background:var(--bg3);border:1px solid var(--border);
+  border-radius:3px;height:6px;overflow:hidden;margin:8px 0}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));
+  transition:width .3s;border-radius:3px;
+  box-shadow:0 0 8px var(--cyan);width:0%}
+
+/* ── Finding cards ────────────────────────────────────────────────── */
+#findings-grid{display:flex;flex-direction:column;gap:10px}
+.finding-card{background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:16px;border-left:4px solid var(--dim);transition:.2s;cursor:pointer}
+.finding-card:hover{border-color:var(--purple);box-shadow:0 0 12px rgba(157,75,255,.12)}
+.finding-card.CRITICAL{border-left-color:var(--red)}
+.finding-card.HIGH{border-left-color:var(--amber)}
+.finding-card.MEDIUM{border-left-color:#ffd166}
+.finding-card.LOW{border-left-color:var(--purple)}
+.finding-card.INFO{border-left-color:var(--dim)}
+.finding-title{font-size:.95em;font-weight:bold;color:#fff;margin:6px 0 4px}
+.finding-ev{font-size:.78em;color:var(--dim);margin:4px 0;word-break:break-all;display:flex;gap:6px}
+.finding-fix{background:rgba(0,240,255,.04);border:1px solid rgba(0,240,255,.15);
+  padding:10px;border-radius:4px;margin-top:10px;font-size:.78em}
+.finding-fix .fix-label{color:var(--cyan);font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.finding-ref{color:var(--purple);font-size:.75em;margin-top:6px;display:flex;align-items:center;gap:6px}
+.finding-ref a{color:var(--purple);text-decoration:none}
+.finding-ref a:hover{text-decoration:underline}
+.finding-url{font-size:.75em;color:var(--magenta);margin:2px 0;word-break:break-all;display:flex;align-items:center;gap:6px}
+.finding-collapsed .finding-fix,.finding-collapsed .finding-ev,
+.finding-collapsed .finding-ref,.finding-collapsed .finding-url{display:none}
+
+/* ── Metrics row ──────────────────────────────────────────────────── */
+#metrics-row{display:flex;flex-wrap:wrap;gap:10px}
+.metric-pill{padding:8px 16px;border:1px solid var(--border);border-radius:20px;
+  font-size:.8em;display:flex;align-items:center;gap:8px;background:var(--bg3)}
+.metric-pill .mk{color:var(--dim)} .metric-pill .mv{font-weight:bold}
+.m-ok .mv{color:var(--cyan)} .m-warn .mv{color:var(--amber)} .m-bad .mv{color:var(--red)}
+
+/* ── Score gauge ──────────────────────────────────────────────────── */
+.score-ring{position:relative;width:90px;height:90px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .score-num{position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:1.4em;font-weight:bold;text-align:center}
+.score-ring .score-lbl{font-size:.5em;display:block;color:var(--dim);letter-spacing:1px}
+
+/* ── Severity counts ──────────────────────────────────────────────── */
+.sev-counts{display:flex;gap:8px;flex-wrap:wrap}
+.sev-count{padding:6px 12px;border-radius:4px;font-size:.8em;font-weight:bold;
+  display:flex;align-items:center;gap:6px;cursor:pointer}
+.sev-count .dot{width:8px;height:8px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor}
+.sev-count.active-filter{outline:2px solid #fff}
+
+/* ── API keys form ────────────────────────────────────────────────── */
+.key-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.key-grid{grid-template-columns:1fr}}
+.key-item label{font-size:.75em;color:var(--dim);letter-spacing:1px;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.key-status{width:8px;height:8px;border-radius:50%;display:inline-block;
+  background:var(--dim);margin-left:2px}
+.key-status.set{background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+.key-get{color:var(--purple);font-size:.85em;margin-left:auto;display:inline-flex;align-items:center;gap:4px;text-decoration:none}
+.key-get:hover{text-decoration:underline}
+.coverage-row{font-size:.82em;line-height:2.1;color:var(--dim);display:flex;align-items:center;gap:8px}
+.coverage-row .icon{flex-shrink:0}
+.coverage-row.yes .icon{color:var(--cyan)}
+.coverage-row.no .icon{color:var(--dim)}
+
+/* ── Scan config row ──────────────────────────────────────────────── */
+.scan-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.scan-url-wrap{flex:1;min-width:200px}
+
+/* ── Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border)}
+::-webkit-scrollbar-thumb:hover{background:var(--dim)}
+
+/* ── Scan flash on start ──────────────────────────────────────────── */
+@keyframes scanFlash{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+.scanning{animation:scanFlash 1.5s ease-in-out infinite}
+
+/* ── Tooltip ──────────────────────────────────────────────────────── */
+[title]{cursor:help}
+
+/* ── Report page ──────────────────────────────────────────────────── */
+#report-frame{width:100%;flex:1;border:1px solid var(--border);
+  border-radius:4px;background:#fff;min-height:400px}
+</style>
+</head>
+<body>
+
+<!-- ── SVG icon sprite ─────────────────────────────────────────────── -->
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-bolt" viewBox="0 0 24 24"><polygon points="13 2 3 14 11 14 11 22 21 10 13 10 13 2"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5.2 3.4 9.7 8 11 4.6-1.3 8-5.8 8-11V5l-8-3z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+  <symbol id="i-redirect" viewBox="0 0 24 24"><polyline points="15 4 20 4 20 9"/><line x1="20" y1="4" x2="10" y2="14"/><path d="M20 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.3"/><line x1="12" y1="12" x2="19" y2="6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="i-printer" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L2 19l3 3 7.3-7.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2z"/></symbol>
+  <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="M21.4 11.5 12.3 20.6a5 5 0 0 1-7.1-7.1l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-2.8-2.8l8.2-8.2"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></symbol>
+</svg>
+
+<!-- Matrix rain -->
+<div id="matrix-bg" aria-hidden="true"></div>
+
+<div id="app">
+
+<!-- ── Navigation ──────────────────────────────────────────────────── -->
+<nav>
+  <div class="logo">
+    <svg class="icon"><use href="#i-bolt"/></svg>
+    <div>
+      <span class="logo-text glitch" data-text="TESTNIT">TESTNIT</span>
+      <span class="logo-sub">SECURITY INTELLIGENCE v2.0</span>
+    </div>
+  </div>
+  <div class="nav-tab active" data-page="scan" onclick="showPage('scan')"><svg class="icon"><use href="#i-settings"/></svg>SCANNER</div>
+  <div class="nav-tab" data-page="findings" onclick="showPage('findings')"><svg class="icon"><use href="#i-search"/></svg>FINDINGS</div>
+  <div class="nav-tab" data-page="report" onclick="showPage('report')"><svg class="icon"><use href="#i-clipboard"/></svg>REPORT</div>
+  <div class="nav-tab" data-page="keys" onclick="showPage('keys')"><svg class="icon"><use href="#i-key"/></svg>API KEYS</div>
+  <div class="nav-right">
+    <span id="status-dot" style="color:var(--dim)"><span class="dot blink"></span>IDLE</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 1 — SCANNER
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-scan" class="page active">
+
+  <!-- URL + scan button -->
+  <div class="card">
+    <div class="card-title">Target Configuration</div>
+    <div class="scan-row">
+      <div class="scan-url-wrap">
+        <input id="url-input" class="neon-input" type="url"
+               placeholder="https://target-site.com"
+               style="font-size:1em;padding:14px 16px" onkeydown="if(event.key==='Enter')startScan()">
+      </div>
+      <button class="btn btn-primary" id="scan-btn" onclick="startScan()"><svg class="icon"><use href="#i-play"/></svg>SCAN</button>
+      <button class="btn btn-danger" id="stop-btn" onclick="stopScan()" disabled><svg class="icon"><use href="#i-stop"/></svg>STOP</button>
+    </div>
+  </div>
+
+  <!-- Module selector -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span>Scan Modules</span>
+      <span style="display:flex;gap:8px">
+        <span style="font-size:.85em;cursor:pointer;color:var(--purple)" onclick="toggleAll(true)">ALL</span>
+        <span style="color:var(--dim)">|</span>
+        <span style="font-size:.85em;cursor:pointer;color:var(--dim)" onclick="toggleAll(false)">NONE</span>
+      </span>
+    </div>
+    <div class="mod-grid" id="mod-grid">
+      <label class="mod-item active"><input type="checkbox" value="recon" checked><svg class="icon"><use href="#i-globe"/></svg>Recon / OSINT</label>
+      <label class="mod-item active"><input type="checkbox" value="headers" checked><svg class="icon"><use href="#i-shield"/></svg>Security Headers</label>
+      <label class="mod-item active"><input type="checkbox" value="ssl" checked><svg class="icon"><use href="#i-lock"/></svg>SSL / TLS</label>
+      <label class="mod-item active"><input type="checkbox" value="files" checked><svg class="icon"><use href="#i-folder"/></svg>Exposed Files</label>
+      <label class="mod-item active"><input type="checkbox" value="xss" checked><svg class="icon"><use href="#i-code"/></svg>XSS Probes</label>
+      <label class="mod-item active"><input type="checkbox" value="sqli" checked><svg class="icon"><use href="#i-database"/></svg>SQL Injection</label>
+      <label class="mod-item active"><input type="checkbox" value="redirect" checked><svg class="icon"><use href="#i-redirect"/></svg>Open Redirect</label>
+      <label class="mod-item active"><input type="checkbox" value="trackers" checked><svg class="icon"><use href="#i-eye"/></svg>Trackers / Spyware</label>
+      <label class="mod-item active"><input type="checkbox" value="reputation" checked><svg class="icon"><use href="#i-radar"/></svg>Reputation DBs</label>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="card" id="progress-card" style="display:none">
+    <div class="card-title scanning" id="progress-label">SCANNING...</div>
+    <div class="prog-wrap"><div class="prog-bar" id="prog-bar"></div></div>
+  </div>
+
+  <!-- Metrics pills -->
+  <div id="metrics-row"></div>
+
+  <!-- Live terminal — real terminal window, fills the rest of the section -->
+  <div class="card" id="terminal-card">
+    <div class="term-titlebar">
+      <div class="term-dots"><span></span><span></span><span></span></div>
+      <div class="term-title"><svg class="icon"><use href="#i-terminal"/></svg>root@cyberlab:~# live_scan_session</div>
+      <div class="term-clear" onclick="clearTerminal()"><svg class="icon"><use href="#i-x"/></svg>CLEAR</div>
+    </div>
+    <div id="terminal"><span class="t-dim"><span class="term-prompt">$</span> CyberLab ready — enter a target URL and press SCAN<span class="term-cursor"></span></span></div>
+  </div>
+
+</div><!-- /page-scan -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 2 — FINDINGS
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-findings" class="page" style="display:none">
+
+  <!-- Score + counts header -->
+  <div class="card" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+    <div class="score-ring" id="score-ring">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle cx="45" cy="45" r="38" fill="none" stroke="#241a3a" stroke-width="8"/>
+        <circle id="score-circle" cx="45" cy="45" r="38" fill="none"
+                stroke="#00f0ff" stroke-width="8" stroke-linecap="round"
+                stroke-dasharray="239" stroke-dashoffset="239"
+                style="transition:stroke-dashoffset 1s"/>
+      </svg>
+      <div class="score-num">
+        <span id="score-num">—</span>
+        <span class="score-lbl">SCORE</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:.75em;color:var(--dim);letter-spacing:2px;margin-bottom:8px">VULNERABILITY COUNTS</div>
+      <div class="sev-counts" id="sev-counts">
+        <div class="sev-count" style="background:rgba(255,40,81,.15);color:var(--red)"    onclick="filterSev('CRITICAL')"><span class="dot"></span>CRITICAL <span id="cnt-CRITICAL">0</span></div>
+        <div class="sev-count" style="background:rgba(255,178,0,.15);color:var(--amber)"  onclick="filterSev('HIGH')"><span class="dot"></span>HIGH <span id="cnt-HIGH">0</span></div>
+        <div class="sev-count" style="background:rgba(255,209,102,.15);color:#ffd166"     onclick="filterSev('MEDIUM')"><span class="dot"></span>MEDIUM <span id="cnt-MEDIUM">0</span></div>
+        <div class="sev-count" style="background:rgba(157,75,255,.15);color:var(--purple)" onclick="filterSev('LOW')"><span class="dot"></span>LOW <span id="cnt-LOW">0</span></div>
+        <div class="sev-count" style="background:rgba(108,100,136,.15);color:var(--dim)"  onclick="filterSev('INFO')"><span class="dot"></span>INFO <span id="cnt-INFO">0</span></div>
+        <div class="sev-count" style="color:var(--purple)" onclick="filterSev(null)"><svg class="icon"><use href="#i-x"/></svg>CLEAR</div>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn btn-secondary" onclick="genReport()"><svg class="icon"><use href="#i-clipboard"/></svg>GENERATE REPORT</button>
+      <button class="btn btn-primary" onclick="exportJSON()"><svg class="icon"><use href="#i-download"/></svg>EXPORT JSON</button>
+    </div>
+  </div>
+
+  <!-- Findings list -->
+  <div id="findings-grid">
+    <div style="color:var(--dim);text-align:center;padding:40px;font-size:.9em">
+      No findings yet — run a scan first
+    </div>
+  </div>
+
+</div><!-- /page-findings -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 3 — REPORT
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-report" class="page" style="display:none;flex-direction:column">
+  <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+    <div style="flex:1;color:var(--dim);font-size:.8em">
+      HTML report rendered below. Use your browser's print/save to export as PDF.
+    </div>
+    <button class="btn btn-primary" onclick="printReport()"><svg class="icon"><use href="#i-printer"/></svg>PRINT / SAVE PDF</button>
+    <button class="btn btn-secondary" onclick="downloadReport()"><svg class="icon"><use href="#i-download"/></svg>DOWNLOAD HTML</button>
+  </div>
+  <iframe id="report-frame" sandbox="allow-same-origin"></iframe>
+</div><!-- /page-report -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 4 — API KEYS
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-keys" class="page" style="display:none">
+  <div class="card">
+    <div class="card-title">API Key Configuration</div>
+
+    <!-- .env status banner -->
+    <div id="env-banner" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+         background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+         padding:10px 14px;margin-bottom:14px;font-size:.8em">
+      <svg class="icon" style="color:var(--cyan);flex-shrink:0"><use href="#i-save"/></svg>
+      <div style="flex:1;min-width:0">
+        <div style="color:var(--cyan);font-weight:600;margin-bottom:2px">
+          Keys stored in <span id="env-path" style="color:var(--amber)">.env</span>
+          <span id="env-exists-badge" style="margin-left:6px;padding:1px 6px;border-radius:3px;
+            font-size:.85em;background:rgba(0,240,255,.12);color:var(--cyan)">FOUND</span>
+        </div>
+        <div style="color:var(--dim)">Edit the file directly or use this form — no restart needed.
+          The app re-reads <code>.env</code> at the start of every scan.</div>
+      </div>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:.75em"
+              onclick="loadKeyStatus()">
+        <svg class="icon"><use href="#i-radar"/></svg>RELOAD
+      </button>
+    </div>
+
+    <p style="font-size:.8em;color:var(--dim);margin-bottom:16px;line-height:1.7">
+      All keys are free tier. Fill them here and click SAVE — or edit <code>.env</code> directly.<br>
+      Without keys the scanner still runs using direct probes and public APIs.
+    </p>
+    <div class="key-grid">
+      <div class="key-item">
+        <label>VIRUSTOTAL <span class="key-status" id="k-virustotal"></span>
+          <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener noreferrer" class="key-get"><svg class="icon"><use href="#i-external"/></svg>Get free key</a></label>
+        <input class="neon-input" id="key-virustotal" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>URLSCAN.IO <span class="key-status" id="k-urlscan"></span>
+          <a href="https://urlscan.io/user/signup" target="_blank" rel="noopener noreferrer" class="key-get"><svg class="icon"><use href="#i-external"/></svg>Get free key</a></label>
+        <input class="neon-input" id="key-urlscan" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>ABUSEIPDB <span class="key-status" id="k-abuseipdb"></span>
+          <a href="https://www.abuseipdb.com/register" target="_blank" rel="noopener noreferrer" class="key-get"><svg class="icon"><use href="#i-external"/></svg>Get free key</a></label>
+        <input class="neon-input" id="key-abuseipdb" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>SHODAN <span class="key-status" id="k-shodan"></span>
+          <a href="https://account.shodan.io/register" target="_blank" rel="noopener noreferrer" class="key-get"><svg class="icon"><use href="#i-external"/></svg>Get free key</a></label>
+        <input class="neon-input" id="key-shodan" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>GOOGLE SAFE BROWSING <span class="key-status" id="k-google_safe"></span>
+          <a href="https://developers.google.com/safe-browsing/v4/get-started" target="_blank" rel="noopener noreferrer" class="key-get"><svg class="icon"><use href="#i-external"/></svg>Get free key</a></label>
+        <input class="neon-input" id="key-google_safe" type="password" placeholder="xxxxxxxx...">
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="saveKeys()"><svg class="icon"><use href="#i-save"/></svg>SAVE KEYS</button>
+      <span id="key-save-msg" style="color:var(--cyan);font-size:.8em;align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">API Coverage Without Keys</div>
+    <div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>Security header analysis</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>SSL/TLS certificate check + SSL Labs grade</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>Exposed file / directory scanning</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>Reflected XSS probes</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>SQL injection error-based probes</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>Open redirect testing</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>Tracker / spyware / cryptominer detection</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>PhishTank lookup (no key)</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>URLScan.io cached results (no key)</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>Basic port scan (no Shodan key)</div>
+      <div class="coverage-row yes"><svg class="icon"><use href="#i-check-circle"/></svg>WHOIS lookup</div>
+      <div class="coverage-row no"><svg class="icon"><use href="#i-circle"/></svg>VirusTotal <span style="color:var(--dim)">(key required)</span></div>
+      <div class="coverage-row no"><svg class="icon"><use href="#i-circle"/></svg>AbuseIPDB <span style="color:var(--dim)">(key required)</span></div>
+      <div class="coverage-row no"><svg class="icon"><use href="#i-circle"/></svg>Google Safe Browsing <span style="color:var(--dim)">(key required)</span></div>
+      <div class="coverage-row no"><svg class="icon"><use href="#i-circle"/></svg>Shodan full port scan <span style="color:var(--dim)">(key required)</span></div>
+    </div>
+  </div>
+</div><!-- /page-keys -->
+
+</div><!-- /app -->
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let findings    = [];
+let metrics     = {};
+let scanMeta    = {};
+let reportHtml  = "";
+let evtSource   = null;
+let progValue   = 0;
+let progTimer   = null;
+let activeFilter= null;
+
+// ── Icon helper (used for content generated dynamically in JS) ─────────────────
+function ic(name){ return `<svg class="icon"><use href="#i-${name}"/></svg>`; }
+
+// ── Matrix rain ───────────────────────────────────────────────────────────────
+(function(){
+  const bg  = document.getElementById("matrix-bg");
+  const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノABCDEF0123456789@#$%";
+  const cols  = Math.floor(window.innerWidth / 16);
+  for(let i=0;i<cols;i++){
+    const d = document.createElement("div");
+    d.className = "col";
+    d.style.left = (i*16)+"px";
+    d.style.animationDuration = (6+Math.random()*14)+"s";
+    d.style.animationDelay    = (-Math.random()*14)+"s";
+    d.style.fontSize          = (10+Math.random()*6)+"px";
+    d.style.opacity           = (.4+Math.random()*.6);
+    let txt="";
+    for(let j=0;j<40;j++) txt+=chars[Math.floor(Math.random()*chars.length)]+"\n";
+    d.textContent=txt;
+    bg.appendChild(d);
+  }
+})();
+
+// ── Checkbox styling ──────────────────────────────────────────────────────────
+document.querySelectorAll(".mod-item input").forEach(cb=>{
+  cb.addEventListener("change",()=>{
+    cb.parentElement.classList.toggle("active", cb.checked);
+  });
+});
+
+function toggleAll(v){
+  document.querySelectorAll(".mod-item input").forEach(cb=>{
+    cb.checked=v;
+    cb.parentElement.classList.toggle("active",v);
+  });
+}
+
+// ── Page navigation ───────────────────────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("page-"+name).style.display="flex";
+  const tab = document.querySelector(`.nav-tab[data-page="${name}"]`);
+  if(tab) tab.classList.add("active");
+}
+
+// ── Terminal helpers ──────────────────────────────────────────────────────────
+function tLog(msg, cls="t-dim"){
+  // SECURITY: always textContent, never innerHTML — msg can contain data that
+  // came from the scan target (domain, headers, etc.) or from what the user
+  // typed into the URL field, none of which is trustworthy.
+  const term = document.getElementById("terminal");
+  const line = document.createElement("div");
+  line.className = "t-line "+cls;
+  line.textContent = msg;
+  term.appendChild(line);
+  term.scrollTop = term.scrollHeight;
+}
+function clearTerminal(){
+  document.getElementById("terminal").innerHTML="";
+}
+function dropToTerminal(){
+  const el = document.getElementById("terminal-card");
+  if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+// ── Progress ──────────────────────────────────────────────────────────────────
+function setProgress(pct){
+  document.getElementById("prog-bar").style.width = pct+"%";
+}
+function startFakeProgress(){
+  progValue = 0;
+  clearInterval(progTimer);
+  progTimer = setInterval(()=>{
+    progValue = Math.min(progValue + Math.random()*3, 90);
+    setProgress(progValue);
+  }, 800);
+}
+function stopProgress(){
+  clearInterval(progTimer);
+  setProgress(100);
+  setTimeout(()=>{ document.getElementById("progress-card").style.display="none"; setProgress(0); }, 1500);
+}
+
+// ── Status dot ────────────────────────────────────────────────────────────────
+function setStatus(text, color){
+  const d = document.getElementById("status-dot");
+  d.innerHTML = `<span class="dot"></span>${text}`;
+  d.style.color = color || "var(--dim)";
+}
+
+// ── Metrics ───────────────────────────────────────────────────────────────────
+function addMetric(data){
+  metrics[data.key] = data;
+  renderMetrics();
+}
+function renderMetrics(){
+  const row = document.getElementById("metrics-row");
+  row.innerHTML = Object.values(metrics).map(m=>`
+    <div class="metric-pill m-${safeMetricColor(m.color)}">
+      <span class="mk">${esc(m.label)}:</span>
+      <span class="mv">${esc(m.value)}</span>
+    </div>`).join("");
+}
+
+// ── Findings ──────────────────────────────────────────────────────────────────
+const SEV_ORDER = {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,INFO:4};
+
+function addFinding(f){
+  findings.push(f);
+  updateCounts();
+  renderFindings();
+  updateScore();
+}
+
+function updateCounts(){
+  ["CRITICAL","HIGH","MEDIUM","LOW","INFO"].forEach(s=>{
+    document.getElementById("cnt-"+s).textContent =
+      findings.filter(f=>f.severity===s).length;
+  });
+}
+
+function filterSev(sev){
+  activeFilter = sev;
+  document.querySelectorAll(".sev-count").forEach(el=>{
+    el.classList.remove("active-filter");
+    if(sev && el.textContent.includes(sev)) el.classList.add("active-filter");
+  });
+  renderFindings();
+}
+
+function renderFindings(){
+  const grid = document.getElementById("findings-grid");
+  const list = activeFilter ? findings.filter(f=>f.severity===activeFilter) : findings;
+  const sorted = [...list].sort((a,b)=>(SEV_ORDER[a.severity]||4)-(SEV_ORDER[b.severity]||4));
+
+  if(!sorted.length){
+    grid.innerHTML = `<div style="color:var(--dim);text-align:center;padding:40px;font-size:.9em">
+      ${findings.length ? 'No findings matching filter' : 'No findings yet — run a scan first'}
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = sorted.map((f,i)=>{
+    const sev = safeSev(f.severity);
+    return `
+    <div class="finding-card ${sev}" onclick="toggleCard(${i})">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="sev sev-${sev}">${sev}</span>
+        <span class="finding-title">${esc(f.title)}</span>
+        <span style="margin-left:auto;font-size:.75em;color:var(--dim)">${esc(f.ts||'')}</span>
+      </div>
+      <div class="finding-url">${ic('link')} ${esc(f.url||'')}</div>
+      <div class="finding-ev">Evidence: ${esc(f.evidence||'')}</div>
+      <div class="finding-fix">
+        <div class="fix-label">${ic('wrench')} HOW TO FIX</div>
+        <div>${esc(f.fix||'')}</div>
+      </div>
+      ${f.ref ? `<div class="finding-ref">${ic('paperclip')} Reference: <a href="${esc(safeHref(f.ref))}" target="_blank" rel="noopener noreferrer">${esc(f.ref)}</a></div>` : ''}
+    </div>`;
+  }).join("");
+}
+
+function toggleCard(i){
+  const cards = document.querySelectorAll(".finding-card");
+  if(cards[i]) cards[i].classList.toggle("finding-collapsed");
+}
+
+function updateScore(){
+  let score = 100;
+  findings.forEach(f=>{
+    score -= {CRITICAL:25,HIGH:15,MEDIUM:8,LOW:3,INFO:0}[f.severity]||0;
+  });
+  score = Math.max(0, score);
+
+  document.getElementById("score-num").textContent = score;
+  const circle = document.getElementById("score-circle");
+  const pct  = score/100;
+  const circ = 239;
+  circle.style.strokeDashoffset = circ-(circ*pct);
+  circle.style.stroke = score>=70?"#00f0ff":score>=40?"#ffb200":"#ff2851";
+}
+
+// ── Main scan ─────────────────────────────────────────────────────────────────
+function startScan(){
+  const url = document.getElementById("url-input").value.trim();
+  if(!url){ alert("Enter a URL first"); return; }
+  if(!/^https?:\/\/.+/i.test(url)){ alert("Enter a valid http:// or https:// URL"); return; }
+
+  const mods = [...document.querySelectorAll(".mod-item input:checked")]
+    .map(cb=>cb.value).join(",");
+  if(!mods){ alert("Select at least one module"); return; }
+
+  // Reset state
+  findings=[]; metrics={}; scanMeta={}; reportHtml="";
+  renderFindings(); renderMetrics(); updateCounts(); updateScore();
+  clearTerminal();
+
+  document.getElementById("scan-btn").disabled = true;
+  document.getElementById("stop-btn").disabled = false;
+  document.getElementById("progress-card").style.display = "block";
+  setStatus("SCANNING", "var(--cyan)");
+  startFakeProgress();
+  dropToTerminal();
+  tLog(`[ ${new Date().toLocaleTimeString()} ] Starting scan → ${url}`, "t-info");
+  tLog(`Modules: ${mods.replace(/,/g,', ')}`, "t-dim");
+
+  if(evtSource) evtSource.close();
+  evtSource = new EventSource(`/api/scan?url=${encodeURIComponent(url)}&modules=${encodeURIComponent(mods)}`);
+
+  evtSource.onmessage = e=>{
+    const data = JSON.parse(e.data);
+    handleEvent(data);
+  };
+  evtSource.onerror = ()=>{
+    tLog("Connection closed.", "t-dim");
+    scanDone();
+  };
+}
+
+function stopScan(){
+  if(evtSource){ evtSource.close(); evtSource=null; }
+  tLog("[ Scan stopped by user ]","t-warn");
+  scanDone();
+}
+
+function scanDone(){
+  document.getElementById("scan-btn").disabled = false;
+  document.getElementById("stop-btn").disabled = true;
+  stopProgress();
+  setStatus("DONE", "var(--purple)");
+  const c = findings.filter(f=>f.severity==="CRITICAL").length;
+  const h = findings.filter(f=>f.severity==="HIGH").length;
+  tLog(`──────────────────────────────────────────────`,"t-dim");
+  tLog(`Scan complete — ${findings.length} findings (${c} CRITICAL, ${h} HIGH)`,"t-info");
+}
+
+function handleEvent(data){
+  switch(data.type){
+    case "start":
+      scanMeta = data;
+      tLog(`Host: ${data.domain} → ${data.ip}`, "t-info");
+      break;
+    case "progress":
+      document.getElementById("progress-label").textContent = data.msg||"Scanning...";
+      tLog(`▶ ${data.msg}`, "t-dim");
+      break;
+    case "log":{
+      const cls = {ok:"t-ok",warn:"t-warn",error:"t-error",info:"t-info"}[data.level]||"t-dim";
+      tLog(`  ${data.msg}`, cls);
+      break;
+    }
+    case "finding":
+      addFinding(data);
+      tLog(`  [${data.severity}] ${data.title}`, "t-warn");
+      break;
+    case "metric":
+      addMetric(data);
+      break;
+    case "done":
+      if(evtSource){ evtSource.close(); evtSource=null; }
+      scanDone();
+      break;
+  }
+}
+
+// ── Report ────────────────────────────────────────────────────────────────────
+async function genReport(){
+  if(!findings.length){ alert("No findings to report — run a scan first"); return; }
+  const res = await fetch("/api/report",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({findings, meta: scanMeta})
+  });
+  const data = await res.json();
+  reportHtml = data.html;
+  const frame = document.getElementById("report-frame");
+  const doc   = frame.contentDocument || frame.contentWindow.document;
+  doc.open(); doc.write(reportHtml); doc.close();
+  showPage("report");
+}
+
+function printReport(){
+  const frame = document.getElementById("report-frame");
+  frame.contentWindow.print();
+}
+
+function downloadReport(){
+  if(!reportHtml){ alert("Generate report first"); return; }
+  const a    = document.createElement("a");
+  a.href     = URL.createObjectURL(new Blob([reportHtml],{type:"text/html"}));
+  a.download = `cyberlab-report-${Date.now()}.html`;
+  a.click();
+}
+
+function exportJSON(){
+  if(!findings.length){ alert("No findings to export"); return; }
+  const out = {meta:scanMeta, generated:new Date().toISOString(),
+               findings, metrics:Object.values(metrics)};
+  const a   = document.createElement("a");
+  a.href    = URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));
+  a.download= `cyberlab-${Date.now()}.json`;
+  a.click();
+}
+
+// ── API keys ──────────────────────────────────────────────────────────────────
+function markKeysActive(activeList){
+  // Clear all dots first so a key that was unset server-side doesn't stay lit
+  ["virustotal","urlscan","abuseipdb","shodan","google_safe"].forEach(k=>{
+    const dot = document.getElementById("k-"+k);
+    if(dot) dot.classList.remove("set");
+  });
+  (activeList||[]).forEach(k=>{
+    const dot = document.getElementById("k-"+k);
+    if(dot) dot.classList.add("set");
+  });
+}
+
+async function saveKeys(){
+  const payload = {};
+  ["virustotal","urlscan","abuseipdb","shodan","google_safe"].forEach(k=>{
+    const v = document.getElementById("key-"+k).value.trim();
+    if(v) payload[k]=v;
+  });
+  const res  = await fetch("/api/keys",{method:"POST",
+    headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const data = await res.json();
+  const msg  = document.getElementById("key-save-msg");
+  const count = data.active.length;
+  msg.textContent = count
+    ? `Saved to .env — ${count} key(s) active: ${data.active.join(", ")}`
+    : "Saved to .env — no keys set yet";
+  markKeysActive(data.active);
+  if(data.env_file) document.getElementById("env-path").textContent = data.env_file;
+  setTimeout(()=>msg.textContent="",5000);
+}
+
+// Runs once on page load. Asks the backend which keys are currently
+// configured so the status dots reflect reality instead of resetting to
+// "unset" on every refresh. Fails silently if the endpoint doesn't exist
+// yet — the form still works without it, it just won't show prior status.
+async function loadKeyStatus(){
+  try{
+    const res = await fetch("/api/keys", { method:"GET" });
+    if(!res.ok) return;
+    const data = await res.json();
+    markKeysActive(data.active);
+
+    // Update .env banner
+    const pathEl   = document.getElementById("env-path");
+    const badgeEl  = document.getElementById("env-exists-badge");
+    if(pathEl && data.env_file){
+      pathEl.textContent = data.env_file;
+    }
+    if(badgeEl){
+      if(data.env_exists){
+        badgeEl.textContent = "FOUND";
+        badgeEl.style.background = "rgba(0,240,255,.12)";
+        badgeEl.style.color = "var(--cyan)";
+      } else {
+        badgeEl.textContent = "NOT FOUND";
+        badgeEl.style.background = "rgba(255,40,81,.12)";
+        badgeEl.style.color = "var(--red)";
+      }
+    }
+  }catch(e){
+    console.warn("Could not load API key status:", e);
+  }
+}
+loadKeyStatus();
+
+// ── Utility / security helpers ──────────────────────────────────────────────
+// Escapes text for safe use inside HTML content AND inside a double-quoted
+// HTML attribute. Use this on every value that did not come from a literal
+// string in this file (scan results, metrics, URL field, etc.) before it
+// is placed via innerHTML.
+function esc(s){
+  return String(s)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+// Only ever allow http/https links to be rendered as clickable hrefs.
+// Blocks javascript:, data:, vbscript: and other script-executing schemes
+// that a malicious "reference" value could otherwise smuggle in.
+function safeHref(url){
+  try{
+    const u = new URL(String(url), window.location.href);
+    if(u.protocol === "http:" || u.protocol === "https:") return u.href;
+  }catch(e){ /* fall through */ }
+  return "#";
+}
+
+// Severity values are used as CSS class names — never trust them verbatim,
+// since an unescaped value there could break out of a class="" attribute.
+const VALID_SEV = ["CRITICAL","HIGH","MEDIUM","LOW","INFO"];
+function safeSev(s){ return VALID_SEV.includes(s) ? s : "INFO"; }
+
+// Metric "color" is likewise used as a class suffix — whitelist it.
+const VALID_METRIC_COLOR = ["ok","warn","bad"];
+function safeMetricColor(c){ return VALID_METRIC_COLOR.includes(c) ? c : "ok"; }
+
+// ── First-visit exit-intent redirect ────────────────────────────────────────
+// Redirects the visitor ONE time only — the very first time they try to leave
+// the site (mouse moves up out of the viewport, i.e. toward the tab bar / URL
+// bar). After it has fired once (ever, per browser), it never fires again.
+//
+// 👉 Set EXIT_REDIRECT_URL below to the page you want to send first-time
+//    leavers to.
+(function(){
+  const EXIT_REDIRECT_URL = "http://localhost:8089/feedback.php"; // <-- change this to your page
+  const FLAG = "cyberlab_exit_redirect_used";
+
+  if(localStorage.getItem(FLAG)) return; // already used once — do nothing ever again
+
+  function fireExitRedirect(){
+    if(localStorage.getItem(FLAG)) return;
+    localStorage.setItem(FLAG, "1");
+    document.removeEventListener("mouseout", onMouseOut);
+    window.location.href = EXIT_REDIRECT_URL;
+  }
+
+  function onMouseOut(e){
+    // Fires when the cursor leaves the top of the viewport toward the browser chrome
+    if(e.clientY <= 0 && !e.relatedTarget && !e.toElement){
+      fireExitRedirect();
+    }
+  }
+
+  document.addEventListener("mouseout", onMouseOut);
+})();
+</script>
+</body>
+</html>

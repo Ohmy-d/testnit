@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ CyberLab — Security Intelligence Platform</title>
+<style>
+/* ── Reset & Base ─────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:      #050508;
+  --bg2:     #0a0a12;
+  --bg3:     #0d0d18;
+  --green:   #00ff41;
+  --cyan:    #00d4ff;
+  --purple:  #bd00ff;
+  --pink:    #ff006e;
+  --orange:  #ff9500;
+  --red:     #ff003c;
+  --text:    #c0c0c0;
+  --dim:     #555;
+  --border:  #1a1a2e;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);
+  font-family:'Courier New',Courier,monospace;overflow-x:hidden}
+
+/* ── Matrix rain background ───────────────────────────────────────── */
+#matrix-bg{position:fixed;top:0;left:0;width:100%;height:100%;
+  overflow:hidden;z-index:0;opacity:.07;pointer-events:none}
+.col{position:absolute;top:-100%;font-size:14px;color:var(--green);
+  writing-mode:vertical-rl;text-orientation:mixed;
+  animation:fall linear infinite;user-select:none}
+@keyframes fall{to{top:110%}}
+
+/* ── Layout ───────────────────────────────────────────────────────── */
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.page{display:none;flex:1;padding:16px;flex-direction:column;gap:12px}
+.page.active{display:flex}
+
+/* ── Top nav ──────────────────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:100;background:rgba(5,5,8,.95);
+  border-bottom:1px solid var(--border);padding:0 16px;
+  display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.logo{padding:12px 16px 12px 0;display:flex;align-items:center;gap:8px;
+  border-right:1px solid var(--border);margin-right:16px}
+.logo-text{font-size:1.3em;font-weight:bold;color:var(--green);
+  text-shadow:0 0 10px var(--green);letter-spacing:2px}
+.logo-sub{font-size:.6em;color:var(--cyan);letter-spacing:4px;display:block;margin-top:-2px}
+.nav-tab{padding:14px 16px;cursor:pointer;font-size:.8em;letter-spacing:1px;
+  border-bottom:2px solid transparent;color:var(--dim);transition:.2s;white-space:nowrap}
+.nav-tab:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
+.nav-tab.active{color:var(--green);border-bottom-color:var(--green)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.blink{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ── Glitch title ─────────────────────────────────────────────────── */
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;
+  top:0;left:0;width:100%;height:100%}
+.glitch::before{color:var(--cyan);animation:glitch1 3s infinite;clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%)}
+.glitch::after{color:var(--pink);animation:glitch2 3s infinite;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%)}
+@keyframes glitch1{0%,94%{transform:translate(0)}95%{transform:translate(-3px,1px)}96%{transform:translate(3px,-1px)}100%{transform:translate(0)}}
+@keyframes glitch2{0%,94%{transform:translate(0)}95%{transform:translate(3px,1px)}96%{transform:translate(-3px,-1px)}100%{transform:translate(0)}}
+
+/* ── Cards & panels ───────────────────────────────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:16px}
+.card-title{font-size:.75em;letter-spacing:2px;color:var(--dim);margin-bottom:12px;
+  text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';display:block;width:8px;height:8px;
+  background:var(--green);border-radius:50%;box-shadow:0 0 6px var(--green)}
+
+/* ── Neon input ───────────────────────────────────────────────────── */
+.neon-input{background:var(--bg3);border:1px solid var(--border);
+  color:var(--green);padding:12px 16px;font-family:inherit;font-size:.95em;
+  outline:none;transition:.3s;width:100%;border-radius:4px}
+.neon-input:focus{border-color:var(--green);box-shadow:0 0 12px rgba(0,255,65,.2)}
+.neon-input::placeholder{color:var(--dim)}
+
+/* ── Buttons ──────────────────────────────────────────────────────── */
+.btn{padding:12px 24px;border:1px solid;font-family:inherit;font-size:.85em;
+  letter-spacing:2px;cursor:pointer;border-radius:4px;transition:.2s;
+  text-transform:uppercase;font-weight:bold}
+.btn-green{border-color:var(--green);color:var(--green);background:transparent}
+.btn-green:hover{background:var(--green);color:#000;box-shadow:0 0 20px rgba(0,255,65,.4)}
+.btn-green:active{transform:scale(.97)}
+.btn-cyan{border-color:var(--cyan);color:var(--cyan);background:transparent}
+.btn-cyan:hover{background:var(--cyan);color:#000;box-shadow:0 0 20px rgba(0,212,255,.4)}
+.btn-red{border-color:var(--red);color:var(--red);background:transparent}
+.btn-red:hover{background:var(--red);color:#fff}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── Checkboxes ───────────────────────────────────────────────────── */
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.mod-item{display:flex;align-items:center;gap:8px;padding:8px 12px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:4px;cursor:pointer;
+  transition:.2s;font-size:.82em}
+.mod-item:hover{border-color:var(--green)}
+.mod-item input{accent-color:var(--green);width:14px;height:14px;cursor:pointer}
+.mod-item.active{border-color:var(--green);background:rgba(0,255,65,.05)}
+
+/* ── Severity badges ──────────────────────────────────────────────── */
+.sev{display:inline-block;padding:2px 8px;border-radius:3px;
+  font-size:.7em;font-weight:bold;letter-spacing:1px}
+.sev-CRITICAL{background:var(--red);color:#fff}
+.sev-HIGH{background:var(--orange);color:#000}
+.sev-MEDIUM{background:#ffaa00;color:#000}
+.sev-LOW{background:#00aaff;color:#000}
+.sev-INFO{background:var(--dim);color:#fff}
+
+/* ── Terminal ─────────────────────────────────────────────────────── */
+#terminal{background:#000;border:1px solid var(--green);border-radius:4px;
+  padding:12px;font-size:.78em;line-height:1.7;overflow-y:auto;
+  max-height:340px;font-family:'Courier New',monospace}
+.t-ok{color:var(--green)} .t-warn{color:var(--orange)}
+.t-error{color:var(--red)} .t-info{color:var(--cyan)} .t-dim{color:var(--dim)}
+.t-line{border-left:2px solid var(--border);padding-left:8px;margin:1px 0}
+
+/* ── Progress bar ─────────────────────────────────────────────────── */
+.prog-wrap{background:var(--bg3);border:1px solid var(--border);
+  border-radius:3px;height:6px;overflow:hidden;margin:8px 0}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));
+  transition:width .3s;border-radius:3px;
+  box-shadow:0 0 8px var(--green);width:0%}
+
+/* ── Finding cards ────────────────────────────────────────────────── */
+#findings-grid{display:flex;flex-direction:column;gap:10px}
+.finding-card{background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:16px;border-left:4px solid var(--dim);transition:.2s}
+.finding-card:hover{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,212,255,.1)}
+.finding-card.CRITICAL{border-left-color:var(--red)}
+.finding-card.HIGH{border-left-color:var(--orange)}
+.finding-card.MEDIUM{border-left-color:#ffaa00}
+.finding-card.LOW{border-left-color:#00aaff}
+.finding-card.INFO{border-left-color:var(--dim)}
+.finding-title{font-size:.95em;font-weight:bold;color:#fff;margin:6px 0 4px}
+.finding-ev{font-size:.78em;color:var(--dim);margin:4px 0;word-break:break-all}
+.finding-fix{background:rgba(0,255,65,.04);border:1px solid rgba(0,255,65,.15);
+  padding:10px;border-radius:4px;margin-top:10px;font-size:.78em}
+.finding-fix .fix-label{color:var(--green);font-weight:bold;margin-bottom:4px}
+.finding-ref{color:var(--cyan);font-size:.75em;margin-top:6px}
+.finding-ref a{color:var(--cyan);text-decoration:none}
+.finding-ref a:hover{text-decoration:underline}
+.finding-url{font-size:.75em;color:var(--purple);margin:2px 0;word-break:break-all}
+.finding-collapsed .finding-fix,.finding-collapsed .finding-ev,
+.finding-collapsed .finding-ref,.finding-collapsed .finding-url{display:none}
+
+/* ── Metrics row ──────────────────────────────────────────────────── */
+#metrics-row{display:flex;flex-wrap:wrap;gap:10px}
+.metric-pill{padding:8px 16px;border:1px solid var(--border);border-radius:20px;
+  font-size:.8em;display:flex;align-items:center;gap:8px;background:var(--bg3)}
+.metric-pill .mk{color:var(--dim)} .metric-pill .mv{font-weight:bold}
+.m-ok .mv{color:var(--green)} .m-warn .mv{color:var(--orange)} .m-bad .mv{color:var(--red)}
+
+/* ── Score gauge ──────────────────────────────────────────────────── */
+.score-ring{position:relative;width:90px;height:90px}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .score-num{position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:1.4em;font-weight:bold;text-align:center}
+.score-ring .score-lbl{font-size:.5em;display:block;color:var(--dim)}
+
+/* ── Severity counts ──────────────────────────────────────────────── */
+.sev-counts{display:flex;gap:8px;flex-wrap:wrap}
+.sev-count{padding:6px 12px;border-radius:4px;font-size:.8em;font-weight:bold;
+  display:flex;align-items:center;gap:6px;cursor:pointer}
+.sev-count.active-filter{outline:2px solid #fff}
+
+/* ── API keys form ────────────────────────────────────────────────── */
+.key-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.key-grid{grid-template-columns:1fr}}
+.key-item label{font-size:.75em;color:var(--dim);letter-spacing:1px;display:block;margin-bottom:4px}
+.key-status{width:8px;height:8px;border-radius:50%;display:inline-block;
+  background:var(--dim);margin-left:6px}
+.key-status.set{background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* ── Scan config row ──────────────────────────────────────────────── */
+.scan-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.scan-url-wrap{flex:1;min-width:200px}
+
+/* ── Scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border)}
+::-webkit-scrollbar-thumb:hover{background:var(--dim)}
+
+/* ── Scan flash on start ──────────────────────────────────────────── */
+@keyframes scanFlash{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+.scanning{animation:scanFlash 1.5s ease-in-out infinite}
+
+/* ── Tooltip ──────────────────────────────────────────────────────── */
+[title]{cursor:help}
+
+/* ── Report page ──────────────────────────────────────────────────── */
+#report-frame{width:100%;flex:1;border:1px solid var(--border);
+  border-radius:4px;background:#fff;min-height:400px}
+</style>
+</head>
+<body>
+
+<!-- Matrix rain -->
+<div id="matrix-bg" aria-hidden="true"></div>
+
+<div id="app">
+
+<!-- ── Navigation ──────────────────────────────────────────────────── -->
+<nav>
+  <div class="logo">
+    <span style="font-size:1.4em">⚡</span>
+    <div>
+      <span class="logo-text glitch" data-text="CYBERLAB">CYBERLAB</span>
+      <span class="logo-sub">SECURITY INTELLIGENCE v2.0</span>
+    </div>
+  </div>
+  <div class="nav-tab active" onclick="showPage('scan')">⚙ SCANNER</div>
+  <div class="nav-tab" onclick="showPage('findings')">🔍 FINDINGS</div>
+  <div class="nav-tab" onclick="showPage('report')">📋 REPORT</div>
+  <div class="nav-tab" onclick="showPage('keys')">🔑 API KEYS</div>
+  <div class="nav-right">
+    <span id="status-dot" class="blink" style="color:var(--dim);font-size:.75em">● IDLE</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 1 — SCANNER
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-scan" class="page active">
+
+  <!-- URL + scan button -->
+  <div class="card">
+    <div class="card-title">Target Configuration</div>
+    <div class="scan-row">
+      <div class="scan-url-wrap">
+        <input id="url-input" class="neon-input" type="url"
+               placeholder="https://target-site.com"
+               style="font-size:1em;padding:14px 16px" onkeydown="if(event.key==='Enter')startScan()">
+      </div>
+      <button class="btn btn-green" id="scan-btn" onclick="startScan()">▶ SCAN</button>
+      <button class="btn btn-red"   id="stop-btn" onclick="stopScan()" disabled>■ STOP</button>
+    </div>
+  </div>
+
+  <!-- Module selector -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span>Scan Modules</span>
+      <span style="display:flex;gap:8px">
+        <span style="font-size:.85em;cursor:pointer;color:var(--cyan)" onclick="toggleAll(true)">ALL</span>
+        <span style="color:var(--dim)">|</span>
+        <span style="font-size:.85em;cursor:pointer;color:var(--dim)" onclick="toggleAll(false)">NONE</span>
+      </span>
+    </div>
+    <div class="mod-grid" id="mod-grid">
+      <label class="mod-item active"><input type="checkbox" value="recon" checked>🌐 Recon / OSINT</label>
+      <label class="mod-item active"><input type="checkbox" value="headers" checked>🛡 Security Headers</label>
+      <label class="mod-item active"><input type="checkbox" value="ssl" checked>🔒 SSL / TLS</label>
+      <label class="mod-item active"><input type="checkbox" value="files" checked>📁 Exposed Files</label>
+      <label class="mod-item active"><input type="checkbox" value="xss" checked>💉 XSS Probes</label>
+      <label class="mod-item active"><input type="checkbox" value="sqli" checked>🗄 SQL Injection</label>
+      <label class="mod-item active"><input type="checkbox" value="redirect" checked>↪ Open Redirect</label>
+      <label class="mod-item active"><input type="checkbox" value="trackers" checked>👁 Trackers / Spyware</label>
+      <label class="mod-item active"><input type="checkbox" value="reputation" checked>🔴 Reputation DBs</label>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="card" id="progress-card" style="display:none">
+    <div class="card-title scanning" id="progress-label">SCANNING...</div>
+    <div class="prog-wrap"><div class="prog-bar" id="prog-bar"></div></div>
+  </div>
+
+  <!-- Metrics pills -->
+  <div id="metrics-row"></div>
+
+  <!-- Live terminal -->
+  <div class="card" style="flex:1">
+    <div class="card-title" style="justify-content:space-between">
+      <span>Live Terminal</span>
+      <span style="font-size:.85em;cursor:pointer;color:var(--dim)" onclick="clearTerminal()">CLEAR</span>
+    </div>
+    <div id="terminal"><span class="t-dim">[ CyberLab ready — enter a target URL and press SCAN ]</span></div>
+  </div>
+
+</div><!-- /page-scan -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 2 — FINDINGS
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-findings" class="page" style="display:none">
+
+  <!-- Score + counts header -->
+  <div class="card" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+    <div class="score-ring" id="score-ring">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle cx="45" cy="45" r="38" fill="none" stroke="#1a1a2e" stroke-width="8"/>
+        <circle id="score-circle" cx="45" cy="45" r="38" fill="none"
+                stroke="#00ff41" stroke-width="8" stroke-linecap="round"
+                stroke-dasharray="239" stroke-dashoffset="239"
+                style="transition:stroke-dashoffset 1s"/>
+      </svg>
+      <div class="score-num">
+        <span id="score-num">—</span>
+        <span class="score-lbl">SCORE</span>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:.75em;color:var(--dim);letter-spacing:2px;margin-bottom:8px">VULNERABILITY COUNTS</div>
+      <div class="sev-counts" id="sev-counts">
+        <div class="sev-count" style="background:rgba(255,0,60,.15);color:var(--red)"   onclick="filterSev('CRITICAL')">● CRITICAL <span id="cnt-CRITICAL">0</span></div>
+        <div class="sev-count" style="background:rgba(255,149,0,.15);color:var(--orange)" onclick="filterSev('HIGH')">● HIGH <span id="cnt-HIGH">0</span></div>
+        <div class="sev-count" style="background:rgba(255,170,0,.15);color:#ffaa00"     onclick="filterSev('MEDIUM')">● MEDIUM <span id="cnt-MEDIUM">0</span></div>
+        <div class="sev-count" style="background:rgba(0,170,255,.15);color:#00aaff"     onclick="filterSev('LOW')">● LOW <span id="cnt-LOW">0</span></div>
+        <div class="sev-count" style="background:rgba(85,85,85,.15);color:var(--dim)"   onclick="filterSev('INFO')">● INFO <span id="cnt-INFO">0</span></div>
+        <div class="sev-count" style="color:var(--cyan)"                                 onclick="filterSev(null)">✕ CLEAR</div>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn btn-cyan" onclick="genReport()">📋 GENERATE REPORT</button>
+      <button class="btn btn-green" onclick="exportJSON()">⬇ EXPORT JSON</button>
+    </div>
+  </div>
+
+  <!-- Findings list -->
+  <div id="findings-grid">
+    <div style="color:var(--dim);text-align:center;padding:40px;font-size:.9em">
+      No findings yet — run a scan first
+    </div>
+  </div>
+
+</div><!-- /page-findings -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 3 — REPORT
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-report" class="page" style="display:none;flex-direction:column">
+  <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+    <div style="flex:1;color:var(--dim);font-size:.8em">
+      HTML report rendered below. Use your browser's print/save to export as PDF.
+    </div>
+    <button class="btn btn-green" onclick="printReport()">🖨 PRINT / SAVE PDF</button>
+    <button class="btn btn-cyan" onclick="downloadReport()">⬇ DOWNLOAD HTML</button>
+  </div>
+  <iframe id="report-frame" sandbox="allow-same-origin"></iframe>
+</div><!-- /page-report -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGE 4 — API KEYS
+═══════════════════════════════════════════════════════════════════ -->
+<div id="page-keys" class="page" style="display:none">
+  <div class="card">
+    <div class="card-title">API Key Configuration</div>
+    <p style="font-size:.8em;color:var(--dim);margin-bottom:16px;line-height:1.7">
+      All keys are free tier. Keys are sent to the backend once and used server-side.<br>
+      Without keys the scanner still runs — it uses direct probes and public APIs.
+    </p>
+    <div class="key-grid">
+      <div class="key-item">
+        <label>VIRUSTOTAL <span class="key-status" id="k-virustotal"></span>
+          <a href="https://www.virustotal.com/gui/join-us" target="_blank"
+             style="color:var(--cyan);font-size:.85em;margin-left:6px">↗ Get free key</a></label>
+        <input class="neon-input" id="key-virustotal" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>URLSCAN.IO <span class="key-status" id="k-urlscan"></span>
+          <a href="https://urlscan.io/user/signup" target="_blank"
+             style="color:var(--cyan);font-size:.85em;margin-left:6px">↗ Get free key</a></label>
+        <input class="neon-input" id="key-urlscan" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>ABUSEIPDB <span class="key-status" id="k-abuseipdb"></span>
+          <a href="https://www.abuseipdb.com/register" target="_blank"
+             style="color:var(--cyan);font-size:.85em;margin-left:6px">↗ Get free key</a></label>
+        <input class="neon-input" id="key-abuseipdb" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>SHODAN <span class="key-status" id="k-shodan"></span>
+          <a href="https://account.shodan.io/register" target="_blank"
+             style="color:var(--cyan);font-size:.85em;margin-left:6px">↗ Get free key</a></label>
+        <input class="neon-input" id="key-shodan" type="password" placeholder="xxxxxxxx...">
+      </div>
+      <div class="key-item">
+        <label>GOOGLE SAFE BROWSING <span class="key-status" id="k-google_safe"></span>
+          <a href="https://developers.google.com/safe-browsing/v4/get-started" target="_blank"
+             style="color:var(--cyan);font-size:.85em;margin-left:6px">↗ Get free key</a></label>
+        <input class="neon-input" id="key-google_safe" type="password" placeholder="xxxxxxxx...">
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px">
+      <button class="btn btn-green" onclick="saveKeys()">💾 SAVE KEYS</button>
+      <span id="key-save-msg" style="color:var(--green);font-size:.8em;align-self:center"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">API Coverage Without Keys</div>
+    <div style="font-size:.82em;line-height:2;color:var(--dim)">
+      <div><span style="color:var(--green)">✓</span> Security header analysis</div>
+      <div><span style="color:var(--green)">✓</span> SSL/TLS certificate check + SSL Labs grade</div>
+      <div><span style="color:var(--green)">✓</span> Exposed file / directory scanning</div>
+      <div><span style="color:var(--green)">✓</span> Reflected XSS probes</div>
+      <div><span style="color:var(--green)">✓</span> SQL injection error-based probes</div>
+      <div><span style="color:var(--green)">✓</span> Open redirect testing</div>
+      <div><span style="color:var(--green)">✓</span> Tracker / spyware / cryptominer detection</div>
+      <div><span style="color:var(--green)">✓</span> PhishTank lookup (no key)</div>
+      <div><span style="color:var(--green)">✓</span> URLScan.io cached results (no key)</div>
+      <div><span style="color:var(--green)">✓</span> Basic port scan (no Shodan key)</div>
+      <div><span style="color:var(--green)">✓</span> WHOIS lookup</div>
+      <div><span style="color:var(--dim)">○</span> VirusTotal <span style="color:var(--dim)">(key required)</span></div>
+      <div><span style="color:var(--dim)">○</span> AbuseIPDB  <span style="color:var(--dim)">(key required)</span></div>
+      <div><span style="color:var(--dim)">○</span> Google Safe Browsing <span style="color:var(--dim)">(key required)</span></div>
+      <div><span style="color:var(--dim)">○</span> Shodan full port scan <span style="color:var(--dim)">(key required)</span></div>
+    </div>
+  </div>
+</div><!-- /page-keys -->
+
+</div><!-- /app -->
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let findings    = [];
+let metrics     = {};
+let scanMeta    = {};
+let reportHtml  = "";
+let evtSource   = null;
+let progValue   = 0;
+let progTimer   = null;
+let activeFilter= null;
+
+// ── Matrix rain ───────────────────────────────────────────────────────────────
+(function(){
+  const bg  = document.getElementById("matrix-bg");
+  const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノABCDEF0123456789@#$%";
+  const cols  = Math.floor(window.innerWidth / 16);
+  for(let i=0;i<cols;i++){
+    const d = document.createElement("div");
+    d.className = "col";
+    d.style.left = (i*16)+"px";
+    d.style.animationDuration = (6+Math.random()*14)+"s";
+    d.style.animationDelay    = (-Math.random()*14)+"s";
+    d.style.fontSize          = (10+Math.random()*6)+"px";
+    d.style.opacity           = (.4+Math.random()*.6);
+    let txt="";
+    for(let j=0;j<40;j++) txt+=chars[Math.floor(Math.random()*chars.length)]+"\n";
+    d.textContent=txt;
+    bg.appendChild(d);
+  }
+})();
+
+// ── Checkbox styling ──────────────────────────────────────────────────────────
+document.querySelectorAll(".mod-item input").forEach(cb=>{
+  cb.addEventListener("change",()=>{
+    cb.parentElement.classList.toggle("active", cb.checked);
+  });
+});
+
+function toggleAll(v){
+  document.querySelectorAll(".mod-item input").forEach(cb=>{
+    cb.checked=v;
+    cb.parentElement.classList.toggle("active",v);
+  });
+}
+
+// ── Page navigation ───────────────────────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("page-"+name).style.display="flex";
+  document.querySelectorAll(".nav-tab").forEach(t=>{
+    if(t.textContent.toLowerCase().includes(name.slice(0,4))) t.classList.add("active");
+  });
+}
+
+// ── Terminal helpers ──────────────────────────────────────────────────────────
+function tLog(msg, cls="t-dim"){
+  const term = document.getElementById("terminal");
+  const line = document.createElement("div");
+  line.className = "t-line "+cls;
+  line.textContent = msg;
+  term.appendChild(line);
+  term.scrollTop = term.scrollHeight;
+}
+function clearTerminal(){
+  document.getElementById("terminal").innerHTML="";
+}
+
+// ── Progress ──────────────────────────────────────────────────────────────────
+function setProgress(pct){
+  document.getElementById("prog-bar").style.width = pct+"%";
+}
+function startFakeProgress(){
+  progValue = 0;
+  clearInterval(progTimer);
+  progTimer = setInterval(()=>{
+    progValue = Math.min(progValue + Math.random()*3, 90);
+    setProgress(progValue);
+  }, 800);
+}
+function stopProgress(){
+  clearInterval(progTimer);
+  setProgress(100);
+  setTimeout(()=>{ document.getElementById("progress-card").style.display="none"; setProgress(0); }, 1500);
+}
+
+// ── Status dot ────────────────────────────────────────────────────────────────
+function setStatus(text, color){
+  const d = document.getElementById("status-dot");
+  d.textContent = "● "+text;
+  d.style.color = color || "var(--dim)";
+}
+
+// ── Metrics ───────────────────────────────────────────────────────────────────
+function addMetric(data){
+  metrics[data.key] = data;
+  renderMetrics();
+}
+function renderMetrics(){
+  const row = document.getElementById("metrics-row");
+  row.innerHTML = Object.values(metrics).map(m=>`
+    <div class="metric-pill m-${m.color||'ok'}">
+      <span class="mk">${m.label}:</span>
+      <span class="mv">${m.value}</span>
+    </div>`).join("");
+}
+
+// ── Findings ──────────────────────────────────────────────────────────────────
+const SEV_ORDER = {CRITICAL:0,HIGH:1,MEDIUM:2,LOW:3,INFO:4};
+
+function addFinding(f){
+  findings.push(f);
+  updateCounts();
+  renderFindings();
+  updateScore();
+}
+
+function updateCounts(){
+  ["CRITICAL","HIGH","MEDIUM","LOW","INFO"].forEach(s=>{
+    document.getElementById("cnt-"+s).textContent =
+      findings.filter(f=>f.severity===s).length;
+  });
+}
+
+function filterSev(sev){
+  activeFilter = sev;
+  document.querySelectorAll(".sev-count").forEach(el=>{
+    el.classList.remove("active-filter");
+    if(sev && el.textContent.includes(sev)) el.classList.add("active-filter");
+  });
+  renderFindings();
+}
+
+function renderFindings(){
+  const grid = document.getElementById("findings-grid");
+  const list = activeFilter ? findings.filter(f=>f.severity===activeFilter) : findings;
+  const sorted = [...list].sort((a,b)=>(SEV_ORDER[a.severity]||4)-(SEV_ORDER[b.severity]||4));
+
+  if(!sorted.length){
+    grid.innerHTML = `<div style="color:var(--dim);text-align:center;padding:40px;font-size:.9em">
+      ${findings.length ? 'No findings matching filter' : 'No findings yet — run a scan first'}
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = sorted.map((f,i)=>`
+    <div class="finding-card ${f.severity}" onclick="toggleCard(${i})">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="sev sev-${f.severity}">${f.severity}</span>
+        <span class="finding-title">${esc(f.title)}</span>
+        <span style="margin-left:auto;font-size:.75em;color:var(--dim)">${f.ts||''}</span>
+      </div>
+      <div class="finding-url">🔗 ${esc(f.url||'')}</div>
+      <div class="finding-ev">Evidence: ${esc(f.evidence||'')}</div>
+      <div class="finding-fix">
+        <div class="fix-label">🔧 HOW TO FIX</div>
+        <div>${esc(f.fix||'')}</div>
+      </div>
+      ${f.ref ? `<div class="finding-ref">📎 Reference: <a href="${esc(f.ref)}" target="_blank">${esc(f.ref)}</a></div>` : ''}
+    </div>`).join("");
+}
+
+function toggleCard(i){
+  const cards = document.querySelectorAll(".finding-card");
+  if(cards[i]) cards[i].classList.toggle("finding-collapsed");
+}
+
+function updateScore(){
+  let score = 100;
+  findings.forEach(f=>{
+    score -= {CRITICAL:25,HIGH:15,MEDIUM:8,LOW:3,INFO:0}[f.severity]||0;
+  });
+  score = Math.max(0, score);
+
+  document.getElementById("score-num").textContent = score;
+  const circle = document.getElementById("score-circle");
+  const pct  = score/100;
+  const circ = 239;
+  circle.style.strokeDashoffset = circ-(circ*pct);
+  circle.style.stroke = score>=70?"#00ff41":score>=40?"#ff9500":"#ff003c";
+}
+
+// ── Main scan ─────────────────────────────────────────────────────────────────
+function startScan(){
+  const url = document.getElementById("url-input").value.trim();
+  if(!url){ alert("Enter a URL first"); return; }
+
+  const mods = [...document.querySelectorAll(".mod-item input:checked")]
+    .map(cb=>cb.value).join(",");
+  if(!mods){ alert("Select at least one module"); return; }
+
+  // Reset state
+  findings=[]; metrics={}; scanMeta={}; reportHtml="";
+  renderFindings(); renderMetrics(); updateCounts(); updateScore();
+  clearTerminal();
+
+  document.getElementById("scan-btn").disabled = true;
+  document.getElementById("stop-btn").disabled = false;
+  document.getElementById("progress-card").style.display = "block";
+  setStatus("SCANNING", "var(--green)");
+  startFakeProgress();
+  tLog(`[ ${new Date().toLocaleTimeString()} ] Starting scan → ${url}`, "t-info");
+  tLog(`Modules: ${mods.replace(/,/g,', ')}`, "t-dim");
+
+  if(evtSource) evtSource.close();
+  evtSource = new EventSource(`/api/scan?url=${encodeURIComponent(url)}&modules=${encodeURIComponent(mods)}`);
+
+  evtSource.onmessage = e=>{
+    const data = JSON.parse(e.data);
+    handleEvent(data);
+  };
+  evtSource.onerror = ()=>{
+    tLog("Connection closed.", "t-dim");
+    scanDone();
+  };
+}
+
+function stopScan(){
+  if(evtSource){ evtSource.close(); evtSource=null; }
+  tLog("[ Scan stopped by user ]","t-warn");
+  scanDone();
+}
+
+function scanDone(){
+  document.getElementById("scan-btn").disabled = false;
+  document.getElementById("stop-btn").disabled = true;
+  stopProgress();
+  setStatus("DONE", "var(--cyan)");
+  const c = findings.filter(f=>f.severity==="CRITICAL").length;
+  const h = findings.filter(f=>f.severity==="HIGH").length;
+  tLog(`──────────────────────────────────────────────`,"t-dim");
+  tLog(`Scan complete — ${findings.length} findings (${c} CRITICAL, ${h} HIGH)`,"t-info");
+}
+
+function handleEvent(data){
+  switch(data.type){
+    case "start":
+      scanMeta = data;
+      tLog(`Host: ${data.domain} → ${data.ip}`, "t-info");
+      break;
+    case "progress":
+      document.getElementById("progress-label").textContent = data.msg||"Scanning...";
+      tLog(`▶ ${data.msg}`, "t-dim");
+      break;
+    case "log":{
+      const cls = {ok:"t-ok",warn:"t-warn",error:"t-error",info:"t-info"}[data.level]||"t-dim";
+      tLog(`  ${data.msg}`, cls);
+      break;
+    }
+    case "finding":
+      addFinding(data);
+      tLog(`  [${data.severity}] ${data.title}`, "t-warn");
+      break;
+    case "metric":
+      addMetric(data);
+      break;
+    case "done":
+      if(evtSource){ evtSource.close(); evtSource=null; }
+      scanDone();
+      break;
+  }
+}
+
+// ── Report ────────────────────────────────────────────────────────────────────
+async function genReport(){
+  if(!findings.length){ alert("No findings to report — run a scan first"); return; }
+  const res = await fetch("/api/report",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({findings, meta: scanMeta})
+  });
+  const data = await res.json();
+  reportHtml = data.html;
+  const frame = document.getElementById("report-frame");
+  const doc   = frame.contentDocument || frame.contentWindow.document;
+  doc.open(); doc.write(reportHtml); doc.close();
+  showPage("report");
+}
+
+function printReport(){
+  const frame = document.getElementById("report-frame");
+  frame.contentWindow.print();
+}
+
+function downloadReport(){
+  if(!reportHtml){ alert("Generate report first"); return; }
+  const a    = document.createElement("a");
+  a.href     = URL.createObjectURL(new Blob([reportHtml],{type:"text/html"}));
+  a.download = `cyberlab-report-${Date.now()}.html`;
+  a.click();
+}
+
+function exportJSON(){
+  if(!findings.length){ alert("No findings to export"); return; }
+  const out = {meta:scanMeta, generated:new Date().toISOString(),
+               findings, metrics:Object.values(metrics)};
+  const a   = document.createElement("a");
+  a.href    = URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));
+  a.download= `cyberlab-${Date.now()}.json`;
+  a.click();
+}
+
+// ── API keys ──────────────────────────────────────────────────────────────────
+async function saveKeys(){
+  const payload = {};
+  ["virustotal","urlscan","abuseipdb","shodan","google_safe"].forEach(k=>{
+    const v = document.getElementById("key-"+k).value.trim();
+    if(v) payload[k]=v;
+  });
+  const res  = await fetch("/api/keys",{method:"POST",
+    headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const data = await res.json();
+  const msg  = document.getElementById("key-save-msg");
+  msg.textContent = `Saved — active: ${data.active.join(", ")||"none"}`;
+  data.active.forEach(k=>{
+    const dot = document.getElementById("k-"+k);
+    if(dot) dot.classList.add("set");
+  });
+  setTimeout(()=>msg.textContent="",3000);
+}
+
+// ── Utility ───────────────────────────────────────────────────────────────────
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+</script>
+</body>
+</html>
